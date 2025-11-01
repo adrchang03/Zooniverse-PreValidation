@@ -62,7 +62,13 @@ def ask_for_start_row():
     start_row = simpledialog.askinteger("Input", "Enter the starting row number:", minvalue=1)
     return start_row
 
-# Load the selected Excel file
+# Prompt user for column F text
+def ask_for_workflow_name():
+    Tk().withdraw()
+    workflow_name = simpledialog.askstring("Input", "Enter the exact text to match in column F (workflow_name):")
+    return workflow_name
+
+# Load the selected Excel file - MAIN LOGIC
 input_file = get_file_via_explorer()
 if input_file:
     df = pd.read_excel(input_file)
@@ -73,6 +79,14 @@ if input_file:
     if start_row is None:
         messagebox.showerror("Error", "No starting row specified. Exiting the program.")
         exit()
+
+
+    # Ask the user for workflow name
+    workflow_name = ask_for_workflow_name()
+    if not workflow_name:
+        messagebox.showerror("Error", "No workflow name specified. Exiting the program.")
+        exit()
+
 
     # Create new DataFrame to store extracted data
     extracted_data = {
@@ -92,8 +106,8 @@ if input_file:
 
     # Iterate through each row to extract relevant information
     for index, row in df.iterrows():
-        # Only process the row if column F has the exact text "BIO1110 Lab - Students"
-        if row['workflow_name'] != "BIO1110 Lab - Students":
+        # Only process the row if column F has the exact text provided from pop up
+        if row.get('workflow_name') != workflow_name:
             continue  # Skip this row if the condition is not met
         
         # Extract filename from 'subject_data' column (column M)
